@@ -22,7 +22,7 @@ Trabalho desenvolvido pelos seguintes alunos:
 
 - [Brian Kévin dos Santos Pravato](https://github.com/kbrianps)
 - [José Henrique de Souza Furtado](https://github.com/furtadoHenrique)
-- Pedro Levi Freitas Nascimento
+- [Pedro Levi Freitas Nascimento](https://github.com/pedrolevi2003)
 - [Natalha da Silva Santanna](https://github.com/NatalhaSantanna)
 
 ## Links
