@@ -10,10 +10,21 @@ info:
     oxigenação, peso corporal e sintomas), consultem o histórico de medições
     e gerem relatórios de saúde com médias, sintomas mais frequentes e alertas
     em um determinado período.
+
+    ## Equipe
+
+    Trabalho desenvolvido para a disciplina de Programação Modular pelos
+    seguintes alunos:
+
+    - Brian Kévin dos Santos Pravato
+    - José Henrique de Souza Furtado
+    - Pedro Levi Freitas Nascimento
+    - Natalha da Silva Santanna
   version: 1.0.0
   contact:
-    name: Equipe de Desenvolvimento - Saúde Cardíaca
-    email: contato@saudecardiaca.com.br
+    name: Equipe Saúde Cardíaca
+    email: heart-health-api@kbrianps.com
+    url: https://github.com/kbrianps/heart-health-api
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
