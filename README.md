@@ -109,6 +109,26 @@ import cruzado entre rotas de módulos diferentes.
 O contrato OpenAPI 3.0 está em [`docs/openapi.yaml`](docs/openapi.yaml).
 Pode ser importado direto no Postman, Insomnia ou Swagger Editor.
 
+### Endpoints disponíveis
+
+| Método | Rota         | Auth | Descrição                              |
+|--------|--------------|------|------------------------------------------|
+| POST   | `/usuarios`  | público | Cadastra um novo usuário              |
+| POST   | `/login`     | público | Autentica e devolve token JWT         |
+
+### Autenticação
+
+O login devolve um JWT que deve ser enviado nas próximas requisições no
+header:
+
+```
+Authorization: Bearer <token>
+```
+
+O token expira em **24 horas**. Após esse prazo é preciso fazer login
+novamente. Erros de token (ausente, inválido ou expirado) retornam **401**
+com mensagem padronizada.
+
 ## Como rodar
 
 > Instruções completas serão adicionadas conforme o projeto evolui.
@@ -117,4 +137,16 @@ Pode ser importado direto no Postman, Insomnia ou Swagger Editor.
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+python run.py
+```
+
+A API sobe em `http://localhost:3000` e aceita conexões pelo IP da rede
+local (necessário para o APK Ionic acessar a API a partir do celular).
+
+## Testes
+
+```bash
+pytest                    # roda tudo
+pytest -m unit            # apenas testes unitários
+pytest -m integration     # apenas testes de integração
 ```
