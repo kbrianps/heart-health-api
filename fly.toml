@@ -9,6 +9,9 @@ primary_region = "gru"
 
 [build]
 
+[deploy]
+  release_command = "python -c 'from app import init_database; init_database()'"
+
 [env]
   FLASK_ENV = "production"
   DATABASE_URL = "sqlite:////data/app.db"

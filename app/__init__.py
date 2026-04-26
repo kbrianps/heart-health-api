@@ -5,6 +5,12 @@ A função `create_app` constrói uma instância do Flask aplicando a configura�
 escolhida, inicializando as extensões e registrando os blueprints de cada
 módulo. Esse padrão permite criar instâncias diferentes para produção,
 desenvolvimento e testes sem duplicar código.
+
+A criação das tabelas (`db.create_all`) é feita apenas em ambiente de
+desenvolvimento. Em produção, isso é responsabilidade do `release_command`
+do Fly.io, evitando uma race condition entre múltiplos workers do gunicorn
+tentarem criar as mesmas tabelas no boot inicial. Em testes, a fixture do
+pytest já cria as tabelas explicitamente.
 """
 
 from flask import Flask
@@ -44,7 +50,19 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(records_bp)
     app.register_blueprint(reports_bp)
 
-    with app.app_context():
-        db.create_all()
+    if app.config.get("DEBUG"):
+        with app.app_context():
+            db.create_all()
 
     return app
+
+
+def init_database() -> None:
+    """
+    Cria as tabelas no banco. Usado pelo release_command do Fly.io e por
+    quem quiser inicializar o banco manualmente em qualquer ambiente.
+    """
+
+    app = create_app()
+    with app.app_context():
+        db.create_all()
