@@ -30,9 +30,11 @@ info:
     url: https://www.gnu.org/licenses/gpl-3.0.html
 
 servers:
-  - url: https://kbrianps.com/heart-health-api/v1
-    description: Servidor de produção
-  - url: http://localhost:3000/v1
+  - url: https://heart-health-api.kbrianps.com/api
+    description: Servidor de produção (Fly.io via subdomínio Cloudflare)
+  - url: https://heart-health-api.fly.dev/api
+    description: Servidor de produção (URL direta do Fly.io)
+  - url: http://localhost:3000/api
     description: Servidor local de desenvolvimento
 
 tags:

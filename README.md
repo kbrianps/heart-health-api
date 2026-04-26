@@ -28,7 +28,9 @@ Trabalho desenvolvido pelos seguintes alunos:
 ## Links
 
 - **Repositório:** https://github.com/kbrianps/heart-health-api
-- **Documentação interativa (Swagger UI):** https://kbrianps.com/heart-health-api/docs (a ser publicada)
+- **API em produção:** https://heart-health-api.kbrianps.com (rodando 24/7 no Fly.io)
+- **Documentação interativa (Swagger UI):** https://heart-health-api.kbrianps.com/docs
+- **URL direta do Fly.io (fallback):** https://heart-health-api.fly.dev
 - **Contrato OpenAPI:** [`docs/openapi.yaml`](docs/openapi.yaml)
 - **Licença:** [GPL-3.0](LICENSE)
 
@@ -134,20 +136,27 @@ import cruzado entre rotas de módulos diferentes.
 O contrato OpenAPI 3.0 está em [`docs/openapi.yaml`](docs/openapi.yaml).
 Pode ser importado direto no Postman, Insomnia ou Swagger Editor.
 
-Com a aplicação rodando, a UI interativa do Swagger fica disponível em
-`http://localhost:3000/docs` e permite testar todos os endpoints direto
-do navegador, inclusive os protegidos por JWT (basta colar o token gerado
-pelo `/login` no botão **Authorize**).
+A UI interativa do Swagger está disponível em duas URLs e permite testar
+todos os endpoints direto do navegador, inclusive os protegidos por JWT
+(basta colar o token gerado pelo `/login` no botão **Authorize**):
+
+- **Produção:** https://heart-health-api.kbrianps.com/docs
+- **Local:** http://localhost:3000/docs (com a aplicação rodando)
 
 ### Endpoints disponíveis
 
-| Método | Rota         | Auth | Descrição                              |
-|--------|--------------|------|------------------------------------------|
-| POST   | `/usuarios`  | público | Cadastra um novo usuário              |
-| POST   | `/login`     | público | Autentica e devolve token JWT         |
-| POST   | `/registros` | JWT  | Registra uma nova medição cardíaca       |
-| GET    | `/registros` | JWT  | Lista as medições do usuário             |
-| GET    | `/relatorios`| JWT  | Gera relatório consolidado por período   |
+Todos os endpoints da API ficam sob o prefixo `/api`. O `/docs` (Swagger UI)
+e o `/openapi.yaml` ficam fora desse prefixo, na raiz do servidor.
+
+| Método | Rota             | Auth | Descrição                              |
+|--------|------------------|------|------------------------------------------|
+| POST   | `/api/usuarios`  | público | Cadastra um novo usuário              |
+| POST   | `/api/login`     | público | Autentica e devolve token JWT         |
+| POST   | `/api/registros` | JWT  | Registra uma nova medição cardíaca       |
+| GET    | `/api/registros` | JWT  | Lista as medições do usuário             |
+| GET    | `/api/relatorios`| JWT  | Gera relatório consolidado por período   |
+| GET    | `/docs`          | público | Swagger UI interativo                 |
+| GET    | `/openapi.yaml`  | público | Contrato OpenAPI 3.0                  |
 
 **Filtros do GET /registros** (todos opcionais via query string):
 - `dataInicio`: data inicial em ISO (`YYYY-MM-DD`)
@@ -179,9 +188,7 @@ O token expira em **24 horas**. Após esse prazo é preciso fazer login
 novamente. Erros de token (ausente, inválido ou expirado) retornam **401**
 com mensagem padronizada.
 
-## Como rodar
-
-> Instruções completas serão adicionadas conforme o projeto evolui.
+## Como rodar localmente
 
 ```bash
 python3 -m venv venv
@@ -200,3 +207,36 @@ pytest                    # roda tudo
 pytest -m unit            # apenas testes unitários
 pytest -m integration     # apenas testes de integração
 ```
+
+## Deploy
+
+A API está deployada no [Fly.io](https://fly.io), na região de São Paulo
+(`gru`), com SQLite em volume persistente de 1 GB. O subdomínio
+`heart-health-api.kbrianps.com` aponta direto para os IPs do Fly via DNS
+da Cloudflare.
+
+### Comandos principais
+
+```bash
+# Ver logs em tempo real
+~/.fly/bin/flyctl logs -a heart-health-api
+
+# Status da máquina
+~/.fly/bin/flyctl status -a heart-health-api
+
+# Deploy de uma nova versão (após git push)
+~/.fly/bin/flyctl deploy --remote-only
+
+# Setar/atualizar secrets (SECRET_KEY, JWT_SECRET_KEY)
+~/.fly/bin/flyctl secrets set CHAVE=valor -a heart-health-api
+```
+
+### Estrutura do deploy
+
+- **Imagem Docker** ([`Dockerfile`](Dockerfile)): Python 3.12 slim + gunicorn com 2 workers
+- **Configuração Fly** ([`fly.toml`](fly.toml)): app, região, volume, http service e release_command
+- **release_command**: roda `init_database()` antes de subir os workers, garantindo
+  que as tabelas existam sem race condition entre múltiplos workers
+- **Volume persistente**: `heart_health_data` montado em `/data`, onde fica `app.db`
+- **Secrets**: `SECRET_KEY` e `JWT_SECRET_KEY` (32 bytes random) gerenciados pelo Fly,
+  nunca versionados no git

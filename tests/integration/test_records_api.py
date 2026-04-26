@@ -20,7 +20,7 @@ def auth_headers(client):
     """
 
     client.post(
-        "/usuarios",
+        "/api/usuarios",
         json={
             "nome": "Brian",
             "sobrenome": "Silva",
@@ -34,7 +34,7 @@ def auth_headers(client):
         },
     )
     token = client.post(
-        "/login", json={"email": "brian@email.com", "senha": "Senha@123"}
+        "/api/login", json={"email": "brian@email.com", "senha": "Senha@123"}
     ).get_json()["token"]
     return {"Authorization": f"Bearer {token}"}
 
@@ -55,7 +55,7 @@ def _payload_medicao(**overrides):
 def test_post_registros_201_com_payload_valido(client, auth_headers):
     """Cadastro de medição feliz retorna 201 com a estrutura completa."""
 
-    response = client.post("/registros", json=_payload_medicao(), headers=auth_headers)
+    response = client.post("/api/registros", json=_payload_medicao(), headers=auth_headers)
 
     assert response.status_code == 201
     body = response.get_json()
@@ -69,7 +69,7 @@ def test_post_registros_201_com_payload_valido(client, auth_headers):
 def test_post_registros_401_sem_token(client):
     """Sem token JWT retorna 401."""
 
-    response = client.post("/registros", json=_payload_medicao())
+    response = client.post("/api/registros", json=_payload_medicao())
 
     assert response.status_code == 401
 
@@ -78,7 +78,7 @@ def test_post_registros_400_quando_valor_fora_do_intervalo(client, auth_headers)
     """Frequência cardíaca fora do range válido retorna 400 com detalhes."""
 
     response = client.post(
-        "/registros",
+        "/api/registros",
         json=_payload_medicao(frequenciaCardiaca=999),
         headers=auth_headers,
     )
@@ -94,7 +94,7 @@ def test_post_registros_400_quando_pressao_arterial_faltando(client, auth_header
     payload = _payload_medicao()
     payload.pop("pressaoArterial")
 
-    response = client.post("/registros", json=payload, headers=auth_headers)
+    response = client.post("/api/registros", json=payload, headers=auth_headers)
 
     assert response.status_code == 400
 
@@ -102,7 +102,7 @@ def test_post_registros_400_quando_pressao_arterial_faltando(client, auth_header
 def test_get_registros_200_lista_vazia(client, auth_headers):
     """Listar sem ter cadastrado nada retorna 200 com array vazio."""
 
-    response = client.get("/registros", headers=auth_headers)
+    response = client.get("/api/registros", headers=auth_headers)
 
     assert response.status_code == 200
     assert response.get_json() == []
@@ -111,14 +111,14 @@ def test_get_registros_200_lista_vazia(client, auth_headers):
 def test_get_registros_200_com_registros(client, auth_headers):
     """Após cadastrar medições, GET retorna a lista no formato esperado."""
 
-    client.post("/registros", json=_payload_medicao(), headers=auth_headers)
+    client.post("/api/registros", json=_payload_medicao(), headers=auth_headers)
     client.post(
-        "/registros",
+        "/api/registros",
         json=_payload_medicao(frequenciaCardiaca=88),
         headers=auth_headers,
     )
 
-    response = client.get("/registros", headers=auth_headers)
+    response = client.get("/api/registros", headers=auth_headers)
 
     assert response.status_code == 200
     body = response.get_json()
@@ -130,9 +130,9 @@ def test_get_registros_respeita_limite(client, auth_headers):
     """Parâmetro limite reduz a quantidade retornada."""
 
     for _ in range(5):
-        client.post("/registros", json=_payload_medicao(), headers=auth_headers)
+        client.post("/api/registros", json=_payload_medicao(), headers=auth_headers)
 
-    response = client.get("/registros?limite=2", headers=auth_headers)
+    response = client.get("/api/registros?limite=2", headers=auth_headers)
 
     assert response.status_code == 200
     assert len(response.get_json()) == 2
@@ -142,7 +142,7 @@ def test_get_registros_400_quando_periodo_incoerente(client, auth_headers):
     """dataInicio posterior a dataFim retorna 400."""
 
     response = client.get(
-        "/registros?dataInicio=2030-01-01&dataFim=2020-01-01",
+        "/api/registros?dataInicio=2030-01-01&dataFim=2020-01-01",
         headers=auth_headers,
     )
 
@@ -153,7 +153,7 @@ def test_get_registros_400_quando_periodo_incoerente(client, auth_headers):
 def test_get_registros_401_sem_token(client):
     """GET sem token retorna 401."""
 
-    response = client.get("/registros")
+    response = client.get("/api/registros")
 
     assert response.status_code == 401
 
@@ -164,10 +164,10 @@ def test_get_registros_isola_por_usuario(client, auth_headers):
     cadastra um segundo usuário, faz login e GET dele deve retornar lista vazia.
     """
 
-    client.post("/registros", json=_payload_medicao(), headers=auth_headers)
+    client.post("/api/registros", json=_payload_medicao(), headers=auth_headers)
 
     client.post(
-        "/usuarios",
+        "/api/usuarios",
         json={
             "nome": "Outra",
             "sobrenome": "Pessoa",
@@ -181,11 +181,11 @@ def test_get_registros_isola_por_usuario(client, auth_headers):
         },
     )
     other_token = client.post(
-        "/login", json={"email": "outra@email.com", "senha": "Senha@123"}
+        "/api/login", json={"email": "outra@email.com", "senha": "Senha@123"}
     ).get_json()["token"]
 
     response = client.get(
-        "/registros", headers={"Authorization": f"Bearer {other_token}"}
+        "/api/registros", headers={"Authorization": f"Bearer {other_token}"}
     )
 
     assert response.status_code == 200

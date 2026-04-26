@@ -17,7 +17,7 @@ def auth_headers(client):
     """Cadastra um usuário, faz login e devolve headers de Authorization."""
 
     client.post(
-        "/usuarios",
+        "/api/usuarios",
         json={
             "nome": "Brian",
             "sobrenome": "Silva",
@@ -31,7 +31,7 @@ def auth_headers(client):
         },
     )
     token = client.post(
-        "/login", json={"email": "brian@email.com", "senha": "Senha@123"}
+        "/api/login", json={"email": "brian@email.com", "senha": "Senha@123"}
     ).get_json()["token"]
     return {"Authorization": f"Bearer {token}"}
 
@@ -46,13 +46,13 @@ def _cria_medicao(client, headers, **overrides):
         "sintomas": [],
     }
     payload.update(overrides)
-    return client.post("/registros", json=payload, headers=headers)
+    return client.post("/api/registros", json=payload, headers=headers)
 
 
 def test_get_relatorios_401_sem_token(client):
     """Sem token JWT retorna 401."""
 
-    response = client.get("/relatorios?dataInicio=2020-01-01&dataFim=2030-12-31")
+    response = client.get("/api/relatorios?dataInicio=2020-01-01&dataFim=2030-12-31")
 
     assert response.status_code == 401
 
@@ -60,7 +60,7 @@ def test_get_relatorios_401_sem_token(client):
 def test_get_relatorios_400_sem_parametros(client, auth_headers):
     """Faltando dataInicio e dataFim retorna 400 com detalhes."""
 
-    response = client.get("/relatorios", headers=auth_headers)
+    response = client.get("/api/relatorios", headers=auth_headers)
 
     assert response.status_code == 400
     body = response.get_json()
@@ -73,7 +73,7 @@ def test_get_relatorios_400_periodo_invertido(client, auth_headers):
     """dataInicio posterior a dataFim retorna 400."""
 
     response = client.get(
-        "/relatorios?dataInicio=2030-01-01&dataFim=2020-01-01",
+        "/api/relatorios?dataInicio=2030-01-01&dataFim=2020-01-01",
         headers=auth_headers,
     )
 
@@ -85,7 +85,7 @@ def test_get_relatorios_404_quando_sem_dados_no_periodo(client, auth_headers):
     """Período sem registros do usuário retorna 404."""
 
     response = client.get(
-        "/relatorios?dataInicio=1900-01-01&dataFim=1900-12-31",
+        "/api/relatorios?dataInicio=1900-01-01&dataFim=1900-12-31",
         headers=auth_headers,
     )
 
@@ -107,7 +107,7 @@ def test_get_relatorios_200_com_estrutura_completa(client, auth_headers):
     )
 
     response = client.get(
-        "/relatorios?dataInicio=2020-01-01&dataFim=2030-12-31",
+        "/api/relatorios?dataInicio=2020-01-01&dataFim=2030-12-31",
         headers=auth_headers,
     )
 
@@ -131,7 +131,7 @@ def test_get_relatorios_isola_por_usuario(client, auth_headers):
     _cria_medicao(client, auth_headers)
 
     client.post(
-        "/usuarios",
+        "/api/usuarios",
         json={
             "nome": "Outra",
             "sobrenome": "Pessoa",
@@ -145,11 +145,11 @@ def test_get_relatorios_isola_por_usuario(client, auth_headers):
         },
     )
     other_token = client.post(
-        "/login", json={"email": "outra@email.com", "senha": "Senha@123"}
+        "/api/login", json={"email": "outra@email.com", "senha": "Senha@123"}
     ).get_json()["token"]
 
     response = client.get(
-        "/relatorios?dataInicio=2020-01-01&dataFim=2030-12-31",
+        "/api/relatorios?dataInicio=2020-01-01&dataFim=2030-12-31",
         headers={"Authorization": f"Bearer {other_token}"},
     )
 

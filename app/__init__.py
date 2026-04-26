@@ -45,10 +45,10 @@ def create_app(config_name: str | None = None) -> Flask:
     register_jwt_handlers(jwt)
     register_swagger(app)
 
-    app.register_blueprint(users_bp)
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(records_bp)
-    app.register_blueprint(reports_bp)
+    app.register_blueprint(users_bp, url_prefix="/api")
+    app.register_blueprint(auth_bp, url_prefix="/api")
+    app.register_blueprint(records_bp, url_prefix="/api")
+    app.register_blueprint(reports_bp, url_prefix="/api")
 
     if app.config.get("DEBUG"):
         with app.app_context():

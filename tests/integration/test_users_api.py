@@ -33,7 +33,7 @@ def _payload(**overrides):
 def test_post_usuarios_201_com_payload_valido(client):
     """Cadastro feliz: retorna 201 e o JSON de resposta no formato do contrato."""
 
-    response = client.post("/usuarios", json=_payload())
+    response = client.post("/api/usuarios", json=_payload())
 
     assert response.status_code == 201
     body = response.get_json()
@@ -46,7 +46,7 @@ def test_post_usuarios_201_com_payload_valido(client):
 def test_post_usuarios_400_quando_campos_obrigatorios_faltando(client):
     """Payload incompleto retorna 400 com lista de detalhes do erro."""
 
-    response = client.post("/usuarios", json={"nome": "Brian"})
+    response = client.post("/api/usuarios", json={"nome": "Brian"})
 
     assert response.status_code == 400
     body = response.get_json()
@@ -58,7 +58,7 @@ def test_post_usuarios_400_quando_campos_obrigatorios_faltando(client):
 def test_post_usuarios_400_quando_email_invalido(client):
     """E-mail mal formado retorna 400."""
 
-    response = client.post("/usuarios", json=_payload(email="naoeh-email"))
+    response = client.post("/api/usuarios", json=_payload(email="naoeh-email"))
 
     assert response.status_code == 400
     body = response.get_json()
@@ -68,7 +68,7 @@ def test_post_usuarios_400_quando_email_invalido(client):
 def test_post_usuarios_400_quando_senhas_nao_conferem(client):
     """Confirmação de senha diferente retorna 400 com mensagem específica."""
 
-    response = client.post("/usuarios", json=_payload(confirmarSenha="Outra@456"))
+    response = client.post("/api/usuarios", json=_payload(confirmarSenha="Outra@456"))
 
     assert response.status_code == 400
     body = response.get_json()
@@ -78,8 +78,8 @@ def test_post_usuarios_400_quando_senhas_nao_conferem(client):
 def test_post_usuarios_409_quando_email_ja_cadastrado(client):
     """Cadastrar duas vezes com o mesmo e-mail retorna 409 no segundo POST."""
 
-    client.post("/usuarios", json=_payload())
-    response = client.post("/usuarios", json=_payload())
+    client.post("/api/usuarios", json=_payload())
+    response = client.post("/api/usuarios", json=_payload())
 
     assert response.status_code == 409
     body = response.get_json()

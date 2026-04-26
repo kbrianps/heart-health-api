@@ -33,10 +33,10 @@ def _payload_usuario(**overrides):
 def test_post_login_200_com_credenciais_validas(client):
     """Login feliz devolve 200 com token, id, email, nome e sobrenome."""
 
-    client.post("/usuarios", json=_payload_usuario())
+    client.post("/api/usuarios", json=_payload_usuario())
 
     response = client.post(
-        "/login", json={"email": "brian@email.com", "senha": "Senha@123"}
+        "/api/login", json={"email": "brian@email.com", "senha": "Senha@123"}
     )
 
     assert response.status_code == 200
@@ -51,7 +51,7 @@ def test_post_login_200_com_credenciais_validas(client):
 def test_post_login_400_quando_payload_invalido(client):
     """Falta de campos obrigatórios devolve 400."""
 
-    response = client.post("/login", json={"email": "brian@email.com"})
+    response = client.post("/api/login", json={"email": "brian@email.com"})
 
     assert response.status_code == 400
 
@@ -59,10 +59,10 @@ def test_post_login_400_quando_payload_invalido(client):
 def test_post_login_401_quando_senha_incorreta(client):
     """Senha errada devolve 401."""
 
-    client.post("/usuarios", json=_payload_usuario())
+    client.post("/api/usuarios", json=_payload_usuario())
 
     response = client.post(
-        "/login", json={"email": "brian@email.com", "senha": "errada"}
+        "/api/login", json={"email": "brian@email.com", "senha": "errada"}
     )
 
     assert response.status_code == 401
@@ -73,7 +73,7 @@ def test_post_login_404_quando_email_nao_cadastrado(client):
     """E-mail não cadastrado devolve 404."""
 
     response = client.post(
-        "/login", json={"email": "naoexiste@email.com", "senha": "qualquer"}
+        "/api/login", json={"email": "naoexiste@email.com", "senha": "qualquer"}
     )
 
     assert response.status_code == 404
