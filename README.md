@@ -1,11 +1,29 @@
 # API de Acompanhamento de Saúde Cardíaca
 
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=flat&logo=flask&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-3-003B57?style=flat&logo=sqlite&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D71F00?style=flat&logo=sqlalchemy&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=flat&logo=jsonwebtokens&logoColor=white)
+![pytest](https://img.shields.io/badge/pytest-8.3-0A9EDC?style=flat&logo=pytest&logoColor=white)
+![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-6BA539?style=flat&logo=openapiinitiative&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-yellow?style=flat)
+
 Backend do Sistema de Acompanhamento de Saúde Cardíaca, desenvolvido como
 trabalho da disciplina de **Programação Modular**.
 
 A API permite que usuários se cadastrem, autentiquem-se, registrem medições
 cardiovasculares (pressão arterial, frequência cardíaca, oxigenação, peso e
 sintomas) e gerem relatórios consolidados por período.
+
+## Equipe
+
+Trabalho desenvolvido pelos seguintes alunos:
+
+- Brian Kévin dos Santos Pravato
+- José Henrique de Souza Furtado
+- Pedro Levi Freitas Nascimento
+- Natalha da Silva Santanna
 
 ## Stack
 
