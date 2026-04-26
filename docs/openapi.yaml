@@ -22,7 +22,7 @@ info:
     - [Natalha da Silva Santanna](https://github.com/NatalhaSantanna)
   version: 1.0.0
   contact:
-    name: Equipe Saúde Cardíaca
+    name: Aplicativo Saúde Cardíaca
     email: heart-health-api@kbrianps.com
     url: https://github.com/kbrianps/heart-health-api
   license:
@@ -30,9 +30,9 @@ info:
     url: https://www.gnu.org/licenses/gpl-3.0.html
 
 servers:
-  - url: https://api.saudecardiaca.com.br/v1
+  - url: https://kbrianps.com/heart-health-api/v1
     description: Servidor de produção
-  - url: https://homolog.api.saudecardiaca.com.br/v1
+  - url: https://kbrianps.com/heart-health-api/homolog/v1
     description: Servidor de homologação
   - url: http://localhost:3000/v1
     description: Servidor local de desenvolvimento
