@@ -14,6 +14,7 @@ from app.core.errors import register_error_handlers
 from app.core.jwt_handlers import register_jwt_handlers
 from app.extensions import db, jwt, ma, cors
 from app.modules.auth.routes import auth_bp
+from app.modules.records.routes import records_bp
 from app.modules.users.routes import users_bp
 
 
@@ -37,6 +38,7 @@ def create_app(config_name: str | None = None) -> Flask:
 
     app.register_blueprint(users_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(records_bp)
 
     with app.app_context():
         db.create_all()
