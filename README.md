@@ -21,7 +21,7 @@ sintomas) e gerem relatórios consolidados por período.
 Trabalho desenvolvido pelos seguintes alunos:
 
 - [Brian Kévin dos Santos Pravato](https://github.com/kbrianps)
-- José Henrique de Souza Furtado
+- [José Henrique de Souza Furtado](https://github.com/furtadoHenrique)
 - Pedro Levi Freitas Nascimento
 - [Natalha da Silva Santanna](https://github.com/NatalhaSantanna)
 
