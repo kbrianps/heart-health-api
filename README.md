@@ -140,6 +140,13 @@ Pode ser importado direto no Postman, Insomnia ou Swagger Editor.
 |--------|--------------|------|------------------------------------------|
 | POST   | `/usuarios`  | público | Cadastra um novo usuário              |
 | POST   | `/login`     | público | Autentica e devolve token JWT         |
+| POST   | `/registros` | JWT  | Registra uma nova medição cardíaca       |
+| GET    | `/registros` | JWT  | Lista as medições do usuário             |
+
+**Filtros do GET /registros** (todos opcionais via query string):
+- `dataInicio`: data inicial em ISO (`YYYY-MM-DD`)
+- `dataFim`: data final em ISO (`YYYY-MM-DD`)
+- `limite`: máximo de registros (1 a 100, padrão 20)
 
 ### Autenticação
 
