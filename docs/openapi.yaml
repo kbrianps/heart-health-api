@@ -32,8 +32,6 @@ info:
 servers:
   - url: https://kbrianps.com/heart-health-api/v1
     description: Servidor de produção
-  - url: https://kbrianps.com/heart-health-api/homolog/v1
-    description: Servidor de homologação
   - url: http://localhost:3000/v1
     description: Servidor local de desenvolvimento
 
