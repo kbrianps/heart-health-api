@@ -13,11 +13,11 @@ from datetime import timedelta
 class BaseConfig:
     """Configuração base, herdada pelas demais."""
 
-    SECRET_KEY = os.getenv("SECRET_KEY", "chave-secreta-trocar-em-producao")
+    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-trocar-em-producao-com-pelo-menos-32-bytes")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret-trocar-em-producao")
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev-jwt-secret-trocar-em-producao-com-pelo-menos-32-bytes")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
 
 
