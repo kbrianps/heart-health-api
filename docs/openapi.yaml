@@ -1,0 +1,762 @@
+openapi: 3.0.3
+
+info:
+  title: API de Acompanhamento de Saúde Cardíaca
+  description: |
+    API REST para o sistema de acompanhamento de saúde cardíaca.
+
+    Permite que usuários cadastrem-se na plataforma, registrem medições
+    relacionadas à saúde cardiovascular (pressão arterial, frequência cardíaca,
+    oxigenação, peso corporal e sintomas), consultem o histórico de medições
+    e gerem relatórios de saúde com médias, sintomas mais frequentes e alertas
+    em um determinado período.
+  version: 1.0.0
+  contact:
+    name: Equipe de Desenvolvimento - Saúde Cardíaca
+    email: contato@saudecardiaca.com.br
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.saudecardiaca.com.br/v1
+    description: Servidor de produção
+  - url: https://homolog.api.saudecardiaca.com.br/v1
+    description: Servidor de homologação
+  - url: http://localhost:3000/v1
+    description: Servidor local de desenvolvimento
+
+tags:
+  - name: Usuários
+    description: Operações de criação de conta de usuários
+  - name: Autenticação
+    description: Operações de autenticação e geração de token
+  - name: Registros
+    description: Registro e consulta de medições cardíacas
+  - name: Relatórios
+    description: Relatórios de saúde cardíaca por período
+
+paths:
+
+  /usuarios:
+    post:
+      tags:
+        - Usuários
+      summary: Criar conta de usuário
+      description: Cria uma nova conta de usuário no sistema de acompanhamento de saúde cardíaca.
+      operationId: criarUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+            examples:
+              exemploUsuario:
+                summary: Exemplo de criação de usuário
+                value:
+                  nome: Brian
+                  sobrenome: Silva
+                  email: brian@email.com
+                  telefone: "+55 21 99999-0000"
+                  senha: Senha@123
+                  confirmarSenha: Senha@123
+                  dataNascimento: "1990-05-20"
+                  sexo: masculino
+                  pais: Brasil
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+              examples:
+                usuarioCriado:
+                  summary: Usuário criado
+                  value:
+                    id: 1
+                    nome: Brian
+                    sobrenome: Silva
+                    email: brian@email.com
+        '400':
+          description: Requisição inválida - campos obrigatórios ausentes, formato de e-mail inválido ou senhas não conferem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                camposAusentes:
+                  summary: Campos obrigatórios ausentes
+                  value:
+                    codigo: 400
+                    mensagem: Campos obrigatórios ausentes
+                    detalhes:
+                      - O campo email é obrigatório
+                      - O campo senha é obrigatório
+                emailInvalido:
+                  summary: Formato de e-mail inválido
+                  value:
+                    codigo: 400
+                    mensagem: Formato de e-mail inválido
+                senhasDiferentes:
+                  summary: Senhas não conferem
+                  value:
+                    codigo: 400
+                    mensagem: As senhas informadas não conferem
+        '409':
+          description: Conflito - e-mail já cadastrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                emailDuplicado:
+                  summary: E-mail já cadastrado
+                  value:
+                    codigo: 409
+                    mensagem: O e-mail informado já está cadastrado
+        '500':
+          $ref: '#/components/responses/ErroServidor'
+
+  /login:
+    post:
+      tags:
+        - Autenticação
+      summary: Autenticar usuário
+      description: Realiza a autenticação do usuário e retorna um token JWT para uso nas demais rotas.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              exemploLogin:
+                summary: Exemplo de login
+                value:
+                  email: brian@email.com
+                  senha: Senha@123
+      responses:
+        '200':
+          description: Autenticação realizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                loginSucesso:
+                  summary: Login realizado com sucesso
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkJyaWFuIiwiaWF0IjoxNzE0MDAwMDAwfQ.abc123
+                    id: 1
+                    email: brian@email.com
+                    nome: Brian
+                    sobrenome: Silva
+        '400':
+          description: Dados do request enviados incorretamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                requisicaoInvalida:
+                  summary: Requisição inválida
+                  value:
+                    codigo: 400
+                    mensagem: Dados de requisição inválidos
+        '401':
+          description: Senha incorreta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                senhaIncorreta:
+                  summary: Senha incorreta
+                  value:
+                    codigo: 401
+                    mensagem: Senha incorreta
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                usuarioNaoEncontrado:
+                  summary: Usuário não encontrado
+                  value:
+                    codigo: 404
+                    mensagem: Usuário não encontrado
+        '500':
+          $ref: '#/components/responses/ErroServidor'
+
+  /registros:
+    post:
+      tags:
+        - Registros
+      summary: Registrar medição cardíaca
+      description: Registra uma nova medição de saúde cardíaca para o usuário autenticado.
+      operationId: criarRegistro
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistroRequest'
+            examples:
+              exemploRegistro:
+                summary: Exemplo de medição
+                value:
+                  pressaoArterial:
+                    sistolica: 120
+                    diastolica: 80
+                  frequenciaCardiaca: 72
+                  oxigenacao: 98
+                  pesoCorporal: 75.5
+                  sintomas:
+                    - falta de ar
+                    - tontura
+      responses:
+        '201':
+          description: Registro de medição criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistroResponse'
+              examples:
+                registroCriado:
+                  summary: Registro criado
+                  value:
+                    id: 101
+                    dataHora: "2026-04-04T14:30:00"
+                    pressaoArterial:
+                      sistolica: 120
+                      diastolica: 80
+                    frequenciaCardiaca: 72
+                    oxigenacao: 98
+                    pesoCorporal: 75.5
+                    sintomas:
+                      - falta de ar
+                      - tontura
+        '400':
+          description: Valores fora do intervalo aceitável ou campos obrigatórios ausentes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                valoresInvalidos:
+                  summary: Valores fora do intervalo
+                  value:
+                    codigo: 400
+                    mensagem: Valores fora do intervalo aceitável
+                    detalhes:
+                      - frequenciaCardiaca deve estar entre 30 e 220
+                      - oxigenacao deve estar entre 50 e 100
+        '401':
+          $ref: '#/components/responses/NaoAutorizado'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                usuarioNaoEncontrado:
+                  summary: Usuário não encontrado
+                  value:
+                    codigo: 404
+                    mensagem: Usuário não encontrado
+        '500':
+          $ref: '#/components/responses/ErroServidor'
+
+    get:
+      tags:
+        - Registros
+      summary: Listar histórico de medições
+      description: Retorna o histórico de medições cardíacas do usuário autenticado.
+      operationId: listarRegistros
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dataInicio
+          in: query
+          required: false
+          description: Data inicial do filtro (formato ISO 8601 - YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+          example: "2026-01-01"
+        - name: dataFim
+          in: query
+          required: false
+          description: Data final do filtro (formato ISO 8601 - YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+          example: "2026-04-04"
+        - name: limite
+          in: query
+          required: false
+          description: Quantidade máxima de registros a retornar
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Lista de medições retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegistroResponse'
+              examples:
+                listaRegistros:
+                  summary: Histórico de medições
+                  value:
+                    - id: 101
+                      dataHora: "2026-04-04T14:30:00"
+                      pressaoArterial:
+                        sistolica: 120
+                        diastolica: 80
+                      frequenciaCardiaca: 72
+                      oxigenacao: 98
+                      pesoCorporal: 75.5
+                      sintomas:
+                        - falta de ar
+        '400':
+          description: Parâmetros de filtro inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                filtroInvalido:
+                  summary: Parâmetros inválidos
+                  value:
+                    codigo: 400
+                    mensagem: Parâmetros de filtro inválidos
+        '401':
+          $ref: '#/components/responses/NaoAutorizado'
+        '404':
+          description: Nenhum registro encontrado para o usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                semRegistros:
+                  summary: Nenhum registro encontrado
+                  value:
+                    codigo: 404
+                    mensagem: Nenhum registro encontrado para o usuário
+        '500':
+          $ref: '#/components/responses/ErroServidor'
+
+  /relatorios:
+    get:
+      tags:
+        - Relatórios
+      summary: Gerar relatório de saúde cardíaca
+      description: |
+        Gera um relatório consolidado das medições cardíacas do usuário em um
+        período específico, incluindo médias dos indicadores, sintomas mais
+        frequentes e alertas relevantes.
+      operationId: gerarRelatorio
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dataInicio
+          in: query
+          required: true
+          description: Data inicial do período do relatório (formato ISO 8601 - YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+          example: "2026-01-01"
+        - name: dataFim
+          in: query
+          required: true
+          description: Data final do período do relatório (formato ISO 8601 - YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+          example: "2026-04-04"
+      responses:
+        '200':
+          description: Relatório gerado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelatorioResponse'
+              examples:
+                relatorioCompleto:
+                  summary: Relatório de saúde
+                  value:
+                    periodo:
+                      inicio: "2026-01-01"
+                      fim: "2026-04-04"
+                    medias:
+                      pressaoSistolica: 122
+                      pressaoDiastolica: 81
+                      frequenciaCardiaca: 74
+                      oxigenacao: 97
+                      pesoCorporal: 75.8
+                    sintomasMaisFrequentes:
+                      - falta de ar
+                      - tontura
+                    alertas:
+                      - Pressão sistólica acima do ideal em 3 registros
+        '400':
+          description: Formato de data inválido ou período incoerente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                dataInvalida:
+                  summary: Formato de data inválido
+                  value:
+                    codigo: 400
+                    mensagem: Formato de data inválido
+                periodoIncoerente:
+                  summary: Período incoerente
+                  value:
+                    codigo: 400
+                    mensagem: A data final deve ser posterior à data inicial
+        '401':
+          $ref: '#/components/responses/NaoAutorizado'
+        '404':
+          description: Nenhum dado encontrado para o período informado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              examples:
+                semDados:
+                  summary: Sem dados no período
+                  value:
+                    codigo: 404
+                    mensagem: Nenhum dado encontrado para o período informado
+        '500':
+          $ref: '#/components/responses/ErroServidor'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT obtido na rota POST /login
+
+  schemas:
+
+    UsuarioRequest:
+      type: object
+      required:
+        - nome
+        - sobrenome
+        - email
+        - telefone
+        - senha
+        - confirmarSenha
+        - dataNascimento
+        - sexo
+        - pais
+      properties:
+        nome:
+          type: string
+          description: Primeiro nome do usuário
+          example: Brian
+        sobrenome:
+          type: string
+          description: Sobrenome do usuário
+          example: Silva
+        email:
+          type: string
+          format: email
+          description: E-mail do usuário (único no sistema)
+          example: brian@email.com
+        telefone:
+          type: string
+          description: Telefone com DDI e DDD
+          example: "+55 21 99999-0000"
+        senha:
+          type: string
+          format: password
+          minLength: 8
+          description: Senha do usuário (mínimo 8 caracteres, com letras, números e símbolos)
+          example: Senha@123
+        confirmarSenha:
+          type: string
+          format: password
+          description: Confirmação da senha (deve ser igual ao campo senha)
+          example: Senha@123
+        dataNascimento:
+          type: string
+          format: date
+          description: Data de nascimento (formato ISO 8601)
+          example: "1990-05-20"
+        sexo:
+          type: string
+          enum:
+            - masculino
+            - feminino
+            - outro
+          description: Sexo do usuário
+          example: masculino
+        pais:
+          type: string
+          description: País de residência do usuário
+          example: Brasil
+
+    UsuarioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identificador único do usuário
+          example: 1
+        nome:
+          type: string
+          example: Brian
+        sobrenome:
+          type: string
+          example: Silva
+        email:
+          type: string
+          format: email
+          example: brian@email.com
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - senha
+      properties:
+        email:
+          type: string
+          format: email
+          example: brian@email.com
+        senha:
+          type: string
+          format: password
+          example: Senha@123
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token JWT a ser utilizado nas requisições autenticadas
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.abc
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: brian@email.com
+        nome:
+          type: string
+          example: Brian
+        sobrenome:
+          type: string
+          example: Silva
+
+    PressaoArterial:
+      type: object
+      required:
+        - sistolica
+        - diastolica
+      properties:
+        sistolica:
+          type: integer
+          minimum: 50
+          maximum: 250
+          description: Pressão sistólica em mmHg
+          example: 120
+        diastolica:
+          type: integer
+          minimum: 30
+          maximum: 150
+          description: Pressão diastólica em mmHg
+          example: 80
+
+    RegistroRequest:
+      type: object
+      required:
+        - pressaoArterial
+        - frequenciaCardiaca
+        - oxigenacao
+        - pesoCorporal
+      properties:
+        pressaoArterial:
+          $ref: '#/components/schemas/PressaoArterial'
+        frequenciaCardiaca:
+          type: integer
+          minimum: 30
+          maximum: 220
+          description: Frequência cardíaca em batimentos por minuto (bpm)
+          example: 72
+        oxigenacao:
+          type: integer
+          minimum: 50
+          maximum: 100
+          description: Saturação de oxigênio no sangue em porcentagem
+          example: 98
+        pesoCorporal:
+          type: number
+          format: float
+          minimum: 20
+          maximum: 400
+          description: Peso corporal em quilogramas
+          example: 75.5
+        sintomas:
+          type: array
+          description: Lista de sintomas relatados pelo usuário
+          items:
+            type: string
+          example:
+            - falta de ar
+            - tontura
+
+    RegistroResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identificador único do registro
+          example: 101
+        dataHora:
+          type: string
+          format: date-time
+          description: Data e hora em que o registro foi criado
+          example: "2026-04-04T14:30:00"
+        pressaoArterial:
+          $ref: '#/components/schemas/PressaoArterial'
+        frequenciaCardiaca:
+          type: integer
+          example: 72
+        oxigenacao:
+          type: integer
+          example: 98
+        pesoCorporal:
+          type: number
+          format: float
+          example: 75.5
+        sintomas:
+          type: array
+          items:
+            type: string
+          example:
+            - falta de ar
+            - tontura
+
+    RelatorioResponse:
+      type: object
+      properties:
+        periodo:
+          type: object
+          properties:
+            inicio:
+              type: string
+              format: date
+              example: "2026-01-01"
+            fim:
+              type: string
+              format: date
+              example: "2026-04-04"
+        medias:
+          type: object
+          properties:
+            pressaoSistolica:
+              type: number
+              example: 122
+            pressaoDiastolica:
+              type: number
+              example: 81
+            frequenciaCardiaca:
+              type: number
+              example: 74
+            oxigenacao:
+              type: number
+              example: 97
+            pesoCorporal:
+              type: number
+              format: float
+              example: 75.8
+        sintomasMaisFrequentes:
+          type: array
+          items:
+            type: string
+          example:
+            - falta de ar
+            - tontura
+        alertas:
+          type: array
+          items:
+            type: string
+          example:
+            - Pressão sistólica acima do ideal em 3 registros
+
+    Erro:
+      type: object
+      properties:
+        codigo:
+          type: integer
+          description: Código HTTP do erro
+          example: 400
+        mensagem:
+          type: string
+          description: Mensagem descritiva do erro
+          example: Requisição inválida
+        detalhes:
+          type: array
+          description: Lista opcional com detalhes adicionais do erro
+          items:
+            type: string
+          example:
+            - O campo email é obrigatório
+
+  responses:
+
+    NaoAutorizado:
+      description: Token ausente, inválido ou expirado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            tokenAusente:
+              summary: Token ausente
+              value:
+                codigo: 401
+                mensagem: Token de autenticação ausente
+            tokenExpirado:
+              summary: Token expirado
+              value:
+                codigo: 401
+                mensagem: Token expirado, faça login novamente
+
+    ErroServidor:
+      description: Erro interno no servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            erroInterno:
+              summary: Erro interno
+              value:
+                codigo: 500
+                mensagem: Erro interno no servidor
