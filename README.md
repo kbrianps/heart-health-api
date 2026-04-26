@@ -7,7 +7,7 @@
 ![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=flat&logo=jsonwebtokens&logoColor=white)
 ![pytest](https://img.shields.io/badge/pytest-8.3-0A9EDC?style=flat&logo=pytest&logoColor=white)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-6BA539?style=flat&logo=openapiinitiative&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-yellow?style=flat)
+![License](https://img.shields.io/badge/license-GPLv3-blue?style=flat)
 
 Backend do Sistema de Acompanhamento de Saúde Cardíaca, desenvolvido como
 trabalho da disciplina de **Programação Modular**.
