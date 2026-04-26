@@ -134,6 +134,11 @@ import cruzado entre rotas de módulos diferentes.
 O contrato OpenAPI 3.0 está em [`docs/openapi.yaml`](docs/openapi.yaml).
 Pode ser importado direto no Postman, Insomnia ou Swagger Editor.
 
+Com a aplicação rodando, a UI interativa do Swagger fica disponível em
+`http://localhost:3000/docs` e permite testar todos os endpoints direto
+do navegador, inclusive os protegidos por JWT (basta colar o token gerado
+pelo `/login` no botão **Authorize**).
+
 ### Endpoints disponíveis
 
 | Método | Rota         | Auth | Descrição                              |
