@@ -10,7 +10,7 @@ desenvolvimento e testes sem duplicar código.
 from flask import Flask
 
 from app.config import get_config
-from app.extensions import db, jwt, ma
+from app.extensions import db, jwt, ma, cors
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -22,6 +22,11 @@ def create_app(config_name: str | None = None) -> Flask:
     db.init_app(app)
     jwt.init_app(app)
     ma.init_app(app)
+    cors.init_app(
+        app,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=False,
+    )
 
     with app.app_context():
         db.create_all()
