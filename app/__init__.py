@@ -10,6 +10,7 @@ desenvolvimento e testes sem duplicar código.
 from flask import Flask
 
 from app.config import get_config
+from app.core.errors import register_error_handlers
 from app.extensions import db, jwt, ma, cors
 
 
@@ -27,6 +28,8 @@ def create_app(config_name: str | None = None) -> Flask:
         resources={r"/*": {"origins": "*"}},
         supports_credentials=False,
     )
+
+    register_error_handlers(app)
 
     with app.app_context():
         db.create_all()
