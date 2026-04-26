@@ -142,11 +142,24 @@ Pode ser importado direto no Postman, Insomnia ou Swagger Editor.
 | POST   | `/login`     | público | Autentica e devolve token JWT         |
 | POST   | `/registros` | JWT  | Registra uma nova medição cardíaca       |
 | GET    | `/registros` | JWT  | Lista as medições do usuário             |
+| GET    | `/relatorios`| JWT  | Gera relatório consolidado por período   |
 
 **Filtros do GET /registros** (todos opcionais via query string):
 - `dataInicio`: data inicial em ISO (`YYYY-MM-DD`)
 - `dataFim`: data final em ISO (`YYYY-MM-DD`)
 - `limite`: máximo de registros (1 a 100, padrão 20)
+
+**Parâmetros do GET /relatorios** (obrigatórios via query string):
+- `dataInicio`: data inicial do período (`YYYY-MM-DD`)
+- `dataFim`: data final do período (`YYYY-MM-DD`)
+
+O relatório retorna médias dos 5 indicadores no período, os 3 sintomas
+mais frequentes e alertas para valores fora dos limites de referência:
+
+- Pressão sistólica > 130 mmHg
+- Pressão diastólica > 85 mmHg
+- Frequência cardíaca > 100 bpm
+- Oxigenação < 95%
 
 ### Autenticação
 
