@@ -12,6 +12,7 @@ from flask import Flask
 from app.config import get_config
 from app.core.errors import register_error_handlers
 from app.core.jwt_handlers import register_jwt_handlers
+from app.core.swagger import register_swagger
 from app.extensions import db, jwt, ma, cors
 from app.modules.auth.routes import auth_bp
 from app.modules.records.routes import records_bp
@@ -36,6 +37,7 @@ def create_app(config_name: str | None = None) -> Flask:
 
     register_error_handlers(app)
     register_jwt_handlers(jwt)
+    register_swagger(app)
 
     app.register_blueprint(users_bp)
     app.register_blueprint(auth_bp)
