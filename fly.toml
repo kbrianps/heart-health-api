@@ -1,0 +1,34 @@
+# Configuração de deploy no Fly.io
+#
+# O nome do app precisa ser único no Fly. Se "heart-health-api" já estiver em
+# uso, o `fly launch` vai sugerir um sufixo aleatório (ex: heart-health-api-bold).
+# Pra trocar manualmente, basta editar a chave `app` abaixo.
+
+app = "heart-health-api"
+primary_region = "gru"
+
+[build]
+
+[env]
+  FLASK_ENV = "production"
+  DATABASE_URL = "sqlite:////data/app.db"
+  PORT = "8080"
+
+# Volume persistente onde o SQLite (app.db) é gravado.
+# Sem isso, cada deploy recria o sistema de arquivos e perde os dados.
+[mounts]
+  source = "heart_health_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
