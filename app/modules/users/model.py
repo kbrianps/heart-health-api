@@ -5,9 +5,15 @@ Representa um usuário cadastrado no sistema. A senha nunca é armazenada em
 texto puro: é guardada como hash, gerado pela camada de service.
 """
 
-from datetime import datetime, date
+from datetime import datetime, timezone
 
 from app.extensions import db
+
+
+def _utc_now() -> datetime:
+    """Retorna o instante atual em UTC, com timezone preservada."""
+
+    return datetime.now(timezone.utc)
 
 
 class User(db.Model):
@@ -24,7 +30,7 @@ class User(db.Model):
     birth_date = db.Column(db.Date, nullable=False)
     gender = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=_utc_now, nullable=False)
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email}>"
