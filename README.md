@@ -20,10 +20,10 @@ sintomas) e gerem relatórios consolidados por período.
 
 Trabalho desenvolvido pelos seguintes alunos:
 
-- Brian Kévin dos Santos Pravato
+- [Brian Kévin dos Santos Pravato](https://github.com/kbrianps)
 - José Henrique de Souza Furtado
 - Pedro Levi Freitas Nascimento
-- Natalha da Silva Santanna
+- [Natalha da Silva Santanna](https://github.com/NatalhaSantanna)
 
 ## Stack
 
