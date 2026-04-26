@@ -25,6 +25,13 @@ Trabalho desenvolvido pelos seguintes alunos:
 - Pedro Levi Freitas Nascimento
 - [Natalha da Silva Santanna](https://github.com/NatalhaSantanna)
 
+## Links
+
+- **Repositório:** https://github.com/kbrianps/heart-health-api
+- **Documentação interativa (Swagger UI):** https://kbrianps.com/heart-health-api/docs (a ser publicada)
+- **Contrato OpenAPI:** [`docs/openapi.yaml`](docs/openapi.yaml)
+- **Licença:** [GPL-3.0](LICENSE)
+
 ## Stack
 
 **Linguagem:** Python 3.12
