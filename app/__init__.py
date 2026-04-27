@@ -17,6 +17,7 @@ from flask import Flask
 
 from app.config import get_config
 from app.core.errors import register_error_handlers
+from app.core.health import register_health
 from app.core.jwt_handlers import register_jwt_handlers
 from app.core.swagger import register_swagger
 from app.extensions import db, jwt, ma, cors
@@ -44,6 +45,7 @@ def create_app(config_name: str | None = None) -> Flask:
     register_error_handlers(app)
     register_jwt_handlers(jwt)
     register_swagger(app)
+    register_health(app)
 
     app.register_blueprint(users_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api")
