@@ -1,0 +1,48 @@
+name: Sync Postman Collection
+
+# Sincroniza a collection pública do Postman sempre que o JSON da collection
+# mudar em main. Mantém a versão pública alinhada com a do repositório,
+# sem precisar de upload manual.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/heart-health-api.postman_collection.json'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Atualizar collection no Postman
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Validar JSON da collection
+        run: jq empty docs/heart-health-api.postman_collection.json
+
+      - name: Atualizar collection via Postman API
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+          COLLECTION_ID: ${{ vars.POSTMAN_COLLECTION_ID }}
+        run: |
+          # A API do Postman espera o body no formato { "collection": { ... } }
+          # então usamos jq pra envelopar o JSON da collection.
+          jq -n --slurpfile c docs/heart-health-api.postman_collection.json \
+            '{collection: $c[0]}' \
+            | curl --fail-with-body -sS -X PUT \
+                "https://api.getpostman.com/collections/$COLLECTION_ID" \
+                -H "X-Api-Key: $POSTMAN_API_KEY" \
+                -H "Content-Type: application/json" \
+                --data @-
+
+      - name: Confirmar atualização
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+          COLLECTION_ID: ${{ vars.POSTMAN_COLLECTION_ID }}
+        run: |
+          curl --fail-with-body -sS \
+            "https://api.getpostman.com/collections/$COLLECTION_ID" \
+            -H "X-Api-Key: $POSTMAN_API_KEY" \
+            | jq '.collection.info | {name, updatedAt}'

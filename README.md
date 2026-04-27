@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml)
 [![Deploy](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml)
+[![Sync Postman](https://github.com/kbrianps/heart-health-api/actions/workflows/sync-postman.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/sync-postman.yml)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/kbrianps/workspace/heart-health-api/collection/26915556-ac9ad8a1-17e4-41c5-8f37-a93a28e778b3)
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=flat&logo=flask&logoColor=white)
@@ -147,11 +149,18 @@ todos os endpoints direto do navegador, inclusive os protegidos por JWT
 - **Produção:** https://heart-health-api.kbrianps.com/docs
 - **Local:** http://localhost:3000/docs (com a aplicação rodando)
 
-Existe também uma **collection do Postman/Insomnia** pronta em
-[`docs/heart-health-api.postman_collection.json`](docs/heart-health-api.postman_collection.json).
-Importe no Postman ou Insomnia, faça o login uma vez (o token é salvo
-automaticamente em uma variável da collection) e dispare os demais requests
-sem precisar copiar o token manualmente.
+Existe também uma **collection do Postman/Insomnia** pronta:
+
+- [Workspace público no Postman](https://www.postman.com/kbrianps/workspace/heart-health-api)
+  com a collection sempre sincronizada com a versão deste repositório
+  (sync automático via GitHub Actions a cada commit no JSON da collection)
+- [Collection direta no Postman](https://www.postman.com/kbrianps/workspace/heart-health-api/collection/26915556-ac9ad8a1-17e4-41c5-8f37-a93a28e778b3)
+- Arquivo local em [`docs/heart-health-api.postman_collection.json`](docs/heart-health-api.postman_collection.json)
+  para quem prefere importar manualmente (funciona em Postman e Insomnia)
+
+Faça o login uma vez (o token é salvo automaticamente em uma variável da
+collection pelo script de Tests) e dispare os demais requests sem precisar
+copiar o token manualmente.
 
 ### Endpoints disponíveis
 
@@ -348,10 +357,14 @@ push/PR → GitHub
   só dispara depois que o CI passou na `main`. Usa `workflow_run` do
   GitHub Actions, garantindo a sequência. O deploy é remoto (build no
   Fly.io, não na VM do GitHub Actions)
-- **Token de deploy**: o `FLY_API_TOKEN` é um token *scoped* só para a
-  app `heart-health-api` (gerado com `flyctl tokens create deploy`),
-  guardado como secret do repositório. Mesmo se vazar, não dá acesso a
-  outras apps da conta Fly
+- **Sync Postman** ([`.github/workflows/sync-postman.yml`](.github/workflows/sync-postman.yml)):
+  sempre que o JSON da collection muda em main, atualiza automaticamente
+  a collection pública via Postman API. Usa filtro de `paths` para só
+  rodar quando o arquivo da collection muda, economizando minutos de CI
+- **Tokens scoped**: o `FLY_API_TOKEN` é restrito só à app
+  `heart-health-api` (gerado com `flyctl tokens create deploy`), e o
+  `POSTMAN_API_KEY` só dá acesso à conta do Postman. Mesmo se vazarem,
+  o estrago é limitado
 - **Smoke test pós-deploy**: depois de subir, o workflow faz um
   `curl /healthz` na URL pública e falha se a aplicação não responder
   200, evitando dar deploy "verde" enquanto a app está caída
@@ -375,10 +388,6 @@ quando o frontend Ionic for desenvolvido:
   (`https://heart-health-api.kbrianps.com/docs`) em uma nova aba. Útil
   para a equipe inspecionar a API durante o desenvolvimento e nas
   apresentações sem precisar lembrar a URL
-- **Sincronização automática da Postman Collection** via GitHub Actions:
-  ampliar o pipeline atual para também chamar a Postman API com o JSON em
-  `docs/heart-health-api.postman_collection.json`, mantendo a collection
-  pública sempre alinhada com o repositório
 - **Cobertura de testes** (`pytest --cov=app`) reportada como badge no
   README
 - **Observabilidade**: integração com algum serviço gratuito de logs
