@@ -1,5 +1,8 @@
 # API de Acompanhamento de Saúde Cardíaca
 
+[![CI](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml)
+[![Deploy](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml)
+
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=flat&logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-3-003B57?style=flat&logo=sqlite&logoColor=white)
@@ -7,6 +10,7 @@
 ![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=flat&logo=jsonwebtokens&logoColor=white)
 ![pytest](https://img.shields.io/badge/pytest-8.3-0A9EDC?style=flat&logo=pytest&logoColor=white)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-6BA539?style=flat&logo=openapiinitiative&logoColor=white)
+![Fly.io](https://img.shields.io/badge/Fly.io-deploy-8B5CF6?style=flat&logo=flydotio&logoColor=white)
 ![License](https://img.shields.io/badge/license-GPLv3-blue?style=flat)
 
 Backend do Sistema de Acompanhamento de Saúde Cardíaca, desenvolvido como
@@ -311,6 +315,55 @@ da Cloudflare.
 - **Secrets**: `SECRET_KEY` e `JWT_SECRET_KEY` (32 bytes random) gerenciados pelo Fly,
   nunca versionados no git
 
+## CI/CD
+
+O projeto tem pipeline de integração e entrega contínuas via **GitHub Actions**.
+Todo push em `main` (ou pull request) dispara automaticamente:
+
+```
+push/PR → GitHub
+       ↓
+  Workflow CI (.github/workflows/ci.yml)
+       ↓
+   ├── Setup Python 3.12 com cache de pip
+   ├── Instala dependências
+   ├── Roda testes unitários (pytest -m unit)
+   ├── Roda testes de integração (pytest -m integration)
+   └── Gera relatório de cobertura
+       ↓ (só se tudo passou)
+  Workflow Deploy (.github/workflows/deploy.yml)
+       ↓
+   ├── Setup do flyctl
+   ├── flyctl deploy --remote-only
+   └── Smoke test em produção (curl /healthz)
+       ↓
+  ✅ Versão nova rodando em https://heart-health-api.kbrianps.com
+```
+
+### Como funciona
+
+- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): garante
+  que código quebrado nunca chega à `main`. Roda em todo push e em todo PR
+- **CD** ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)):
+  só dispara depois que o CI passou na `main`. Usa `workflow_run` do
+  GitHub Actions, garantindo a sequência. O deploy é remoto (build no
+  Fly.io, não na VM do GitHub Actions)
+- **Token de deploy**: o `FLY_API_TOKEN` é um token *scoped* só para a
+  app `heart-health-api` (gerado com `flyctl tokens create deploy`),
+  guardado como secret do repositório. Mesmo se vazar, não dá acesso a
+  outras apps da conta Fly
+- **Smoke test pós-deploy**: depois de subir, o workflow faz um
+  `curl /healthz` na URL pública e falha se a aplicação não responder
+  200, evitando dar deploy "verde" enquanto a app está caída
+
+### Por que isso ajuda na modularização
+
+Os módulos por feature (`users`, `auth`, `records`, `reports`) permitem
+que os testes rodem em paralelo: cada um valida sua área isoladamente,
+sem dependência cruzada. Se um módulo quebra, o feedback é imediato e
+localizado, sem afetar a confiabilidade dos outros. O pipeline cresce
+linearmente com o número de módulos sem desacelerar.
+
 ## Roadmap / Próximos passos
 
 Itens previstos para as próximas iterações do projeto, principalmente
@@ -323,7 +376,7 @@ quando o frontend Ionic for desenvolvido:
   para a equipe inspecionar a API durante o desenvolvimento e nas
   apresentações sem precisar lembrar a URL
 - **Sincronização automática da Postman Collection** via GitHub Actions:
-  a cada push em `main`, o workflow chama a Postman API com o JSON em
+  ampliar o pipeline atual para também chamar a Postman API com o JSON em
   `docs/heart-health-api.postman_collection.json`, mantendo a collection
   pública sempre alinhada com o repositório
 - **Cobertura de testes** (`pytest --cov=app`) reportada como badge no

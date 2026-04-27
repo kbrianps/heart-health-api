@@ -1,0 +1,43 @@
+name: CI
+
+# Roda em todo push e em todo pull request, garantindo que código quebrado
+# seja detectado antes de chegar à branch main.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Lint e testes (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Instala dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Roda testes unitários (rápidos, isolados)
+        run: pytest -m unit -v
+
+      - name: Roda testes de integração (sobem o app, banco em memória)
+        run: pytest -m integration -v
+
+      - name: Cobertura geral
+        run: pytest --cov=app --cov-report=term-missing
