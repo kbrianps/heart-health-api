@@ -3,6 +3,7 @@
 [![CI](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml)
 [![Deploy](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml)
 [![Sync Postman](https://github.com/kbrianps/heart-health-api/actions/workflows/sync-postman.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/sync-postman.yml)
+
 [![Postman Docs](https://img.shields.io/badge/Postman-documentation-FF6C37?style=flat&logo=postman&logoColor=white)](https://documenter.getpostman.com/view/26915556/2sBXqGsNJb)
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/26915556-ac9ad8a1-17e4-41c5-8f37-a93a28e778b3?action=collection%2Fimport)
 
