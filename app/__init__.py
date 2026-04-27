@@ -33,6 +33,11 @@ def create_app(config_name: str | None = None) -> Flask:
     app = Flask(__name__)
     app.config.from_object(get_config(config_name))
 
+    # Mantém caracteres acentuados na resposta JSON em UTF-8 puro, sem
+    # escapar para sequências \uXXXX. Deixa o output legível (ex: "não",
+    # "São Paulo") em vez de "não", "São Paulo".
+    app.json.ensure_ascii = False
+
     db.init_app(app)
     jwt.init_app(app)
     ma.init_app(app)

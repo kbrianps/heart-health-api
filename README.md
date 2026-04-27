@@ -310,3 +310,23 @@ da Cloudflare.
 - **Volume persistente**: `heart_health_data` montado em `/data`, onde fica `app.db`
 - **Secrets**: `SECRET_KEY` e `JWT_SECRET_KEY` (32 bytes random) gerenciados pelo Fly,
   nunca versionados no git
+
+## Roadmap / Próximos passos
+
+Itens previstos para as próximas iterações do projeto, principalmente
+quando o frontend Ionic for desenvolvido:
+
+- **Frontend Ionic (Angular ou React)** consumindo esta API, gerando APK
+  Android para a entrega da disciplina de front-end
+- **Tela de `/admin` no front** com um botão que abre o Swagger UI
+  (`https://heart-health-api.kbrianps.com/docs`) em uma nova aba. Útil
+  para a equipe inspecionar a API durante o desenvolvimento e nas
+  apresentações sem precisar lembrar a URL
+- **Sincronização automática da Postman Collection** via GitHub Actions:
+  a cada push em `main`, o workflow chama a Postman API com o JSON em
+  `docs/heart-health-api.postman_collection.json`, mantendo a collection
+  pública sempre alinhada com o repositório
+- **Cobertura de testes** (`pytest --cov=app`) reportada como badge no
+  README
+- **Observabilidade**: integração com algum serviço gratuito de logs
+  (BetterStack, Logtail) puxando logs do Fly
