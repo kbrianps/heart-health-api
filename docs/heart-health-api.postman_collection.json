@@ -1,0 +1,194 @@
+{
+  "info": {
+    "name": "API de Acompanhamento de Saúde Cardíaca",
+    "description": "Collection de exemplo para todos os endpoints da API.\n\nPara usar:\n1. Importe esta collection no Postman ou Insomnia\n2. Selecione um environment com a variável `baseUrl` (ex: https://heart-health-api.kbrianps.com)\n3. Execute primeiro o request 'Cadastrar usuário' e depois 'Login' — o login salva automaticamente o token na variável `token` da collection\n4. Execute os demais requests, que já vêm configurados com Authorization: Bearer {{token}}\n\nRepositório: https://github.com/kbrianps/heart-health-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "heart-health-api-collection-v1"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://heart-health-api.kbrianps.com",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Usuários",
+      "item": [
+        {
+          "name": "Cadastrar usuário",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Brian\",\n  \"sobrenome\": \"Pravato\",\n  \"email\": \"brian@email.com\",\n  \"telefone\": \"+55 21 99999-0000\",\n  \"senha\": \"Senha@123\",\n  \"confirmarSenha\": \"Senha@123\",\n  \"dataNascimento\": \"1990-05-20\",\n  \"sexo\": \"masculino\",\n  \"pais\": \"Brasil\"\n}"
+            },
+            "description": "Cria uma nova conta. Retorna 201 com id e dados básicos do usuário."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Autenticação",
+      "item": [
+        {
+          "name": "Login (salva token automaticamente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('token', body.token);",
+                  "  console.log('Token salvo na variável token da collection');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"brian@email.com\",\n  \"senha\": \"Senha@123\"\n}"
+            },
+            "description": "Autentica o usuário e devolve um token JWT. O script de Tests salva o token na variável `token` da collection automaticamente."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Registros (medições)",
+      "item": [
+        {
+          "name": "Criar registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/registros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "registros"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pressaoArterial\": {\n    \"sistolica\": 120,\n    \"diastolica\": 80\n  },\n  \"frequenciaCardiaca\": 72,\n  \"oxigenacao\": 98,\n  \"pesoCorporal\": 75.5,\n  \"sintomas\": [\"falta de ar\", \"tontura\"]\n}"
+            },
+            "description": "Registra uma nova medição cardíaca para o usuário autenticado."
+          }
+        },
+        {
+          "name": "Listar registros",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/registros?limite=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "registros"],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "20",
+                  "description": "Quantidade máxima (1 a 100, padrão 20)"
+                },
+                {
+                  "key": "dataInicio",
+                  "value": "2026-01-01",
+                  "description": "Data inicial (opcional)",
+                  "disabled": true
+                },
+                {
+                  "key": "dataFim",
+                  "value": "2026-12-31",
+                  "description": "Data final (opcional)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista as medições do usuário autenticado, do mais recente para o mais antigo. Filtros de data são opcionais."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Relatórios",
+      "item": [
+        {
+          "name": "Gerar relatório de saúde",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/relatorios?dataInicio=2026-01-01&dataFim=2026-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "relatorios"],
+              "query": [
+                {
+                  "key": "dataInicio",
+                  "value": "2026-01-01",
+                  "description": "Data inicial do período (obrigatório)"
+                },
+                {
+                  "key": "dataFim",
+                  "value": "2026-12-31",
+                  "description": "Data final do período (obrigatório)"
+                }
+              ]
+            },
+            "description": "Gera um relatório consolidado com médias dos 5 indicadores, sintomas mais frequentes e alertas para valores fora dos limites de referência."
+          }
+        }
+      ]
+    }
+  ]
+}

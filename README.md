@@ -143,6 +143,12 @@ todos os endpoints direto do navegador, inclusive os protegidos por JWT
 - **Produção:** https://heart-health-api.kbrianps.com/docs
 - **Local:** http://localhost:3000/docs (com a aplicação rodando)
 
+Existe também uma **collection do Postman/Insomnia** pronta em
+[`docs/heart-health-api.postman_collection.json`](docs/heart-health-api.postman_collection.json).
+Importe no Postman ou Insomnia, faça o login uma vez (o token é salvo
+automaticamente em uma variável da collection) e dispare os demais requests
+sem precisar copiar o token manualmente.
+
 ### Endpoints disponíveis
 
 Todos os endpoints da API ficam sob o prefixo `/api`. O `/docs` (Swagger UI)
@@ -187,6 +193,70 @@ Authorization: Bearer <token>
 O token expira em **24 horas**. Após esse prazo é preciso fazer login
 novamente. Erros de token (ausente, inválido ou expirado) retornam **401**
 com mensagem padronizada.
+
+### Exemplos com `curl`
+
+Os exemplos abaixo usam a URL pública. Pra rodar contra o ambiente local,
+basta trocar `https://heart-health-api.kbrianps.com` por
+`http://localhost:3000`.
+
+**1. Cadastrar usuário**
+
+```bash
+curl -X POST https://heart-health-api.kbrianps.com/api/usuarios \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Brian",
+    "sobrenome": "Pravato",
+    "email": "brian@email.com",
+    "telefone": "+55 21 99999-0000",
+    "senha": "Senha@123",
+    "confirmarSenha": "Senha@123",
+    "dataNascimento": "1990-05-20",
+    "sexo": "masculino",
+    "pais": "Brasil"
+  }'
+```
+
+**2. Fazer login (salvando o token em variável de shell)**
+
+```bash
+TOKEN=$(curl -s -X POST https://heart-health-api.kbrianps.com/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"brian@email.com","senha":"Senha@123"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+
+echo "$TOKEN"
+```
+
+**3. Registrar uma medição cardíaca**
+
+```bash
+curl -X POST https://heart-health-api.kbrianps.com/api/registros \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pressaoArterial": { "sistolica": 120, "diastolica": 80 },
+    "frequenciaCardiaca": 72,
+    "oxigenacao": 98,
+    "pesoCorporal": 75.5,
+    "sintomas": ["falta de ar", "tontura"]
+  }'
+```
+
+**4. Listar medições do usuário**
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://heart-health-api.kbrianps.com/api/registros?limite=10"
+```
+
+**5. Gerar relatório consolidado de um período**
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://heart-health-api.kbrianps.com/api/relatorios?dataInicio=2026-01-01&dataFim=2026-12-31"
+```
 
 ## Como rodar localmente
 
