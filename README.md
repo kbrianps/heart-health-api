@@ -3,7 +3,7 @@
 [![CI](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/ci.yml)
 [![Deploy](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/deploy.yml)
 [![Sync Postman](https://github.com/kbrianps/heart-health-api/actions/workflows/sync-postman.yml/badge.svg)](https://github.com/kbrianps/heart-health-api/actions/workflows/sync-postman.yml)
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/kbrianps/workspace/heart-health-api/collection/26915556-ac9ad8a1-17e4-41c5-8f37-a93a28e778b3)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/26915556-ac9ad8a1-17e4-41c5-8f37-a93a28e778b3?action=collection%2Fimport)
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=flat&logo=flask&logoColor=white)
@@ -149,18 +149,24 @@ todos os endpoints direto do navegador, inclusive os protegidos por JWT
 - **Produção:** https://heart-health-api.kbrianps.com/docs
 - **Local:** http://localhost:3000/docs (com a aplicação rodando)
 
-Existe também uma **collection do Postman/Insomnia** pronta:
+Existe também uma **collection do Postman/Insomnia** pronta. Três formas
+de usar, do mais conveniente para o mais manual:
 
-- [Workspace público no Postman](https://www.postman.com/kbrianps/workspace/heart-health-api)
-  com a collection sempre sincronizada com a versão deste repositório
-  (sync automático via GitHub Actions a cada commit no JSON da collection)
-- [Collection direta no Postman](https://www.postman.com/kbrianps/workspace/heart-health-api/collection/26915556-ac9ad8a1-17e4-41c5-8f37-a93a28e778b3)
-- Arquivo local em [`docs/heart-health-api.postman_collection.json`](docs/heart-health-api.postman_collection.json)
-  para quem prefere importar manualmente (funciona em Postman e Insomnia)
+- **Botão "Run in Postman"** no topo deste README: abre o Postman
+  (desktop ou web) e oferece importar a collection direto. Sem login
+  necessário no clique
+- **Workspace público no Postman** (requer login no Postman.com):
+  https://www.postman.com/kbrianps/workspace/heart-health-api — a
+  collection ali está sempre sincronizada com este repositório via
+  GitHub Actions, a cada commit no JSON
+- **Arquivo local** em
+  [`docs/heart-health-api.postman_collection.json`](docs/heart-health-api.postman_collection.json):
+  importe manualmente em Postman ou Insomnia
 
-Faça o login uma vez (o token é salvo automaticamente em uma variável da
-collection pelo script de Tests) e dispare os demais requests sem precisar
-copiar o token manualmente.
+Em qualquer um dos caminhos: faça o login uma vez (o request "Login" tem
+um script de Tests que salva o token automaticamente em uma variável da
+collection) e dispare os demais requests sem precisar copiar o token
+manualmente.
 
 ### Endpoints disponíveis
 
